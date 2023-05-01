@@ -1,0 +1,10 @@
+version = 0.1
+[default.deploy.parameters]
+stack_name = "nod-read-api"
+resolve_s3 = true
+s3_prefix = "nod-read-api"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = "MainS3Bucket=\"lo-glo-neuro-storage\""
+image_repositories = ["ReadServiceLambda=165443708813.dkr.ecr.us-east-1.amazonaws.com/nodreadapi555b766f/readservicelambdae8cc71edrepo"]
