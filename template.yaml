@@ -1,0 +1,54 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Neuro On Demand - Read API
+
+Parameters:
+  MainS3Bucket:
+    Type: String
+    Default: lo-glo-neuro-storage
+
+Resources:
+  ReadServiceLambda:
+    Type: AWS::Serverless::Function 
+    Properties:
+      FunctionName: nod-read-api
+      PackageType: Image
+      Timeout: 60
+      MemorySize: 2048
+      Environment:
+        Variables:
+          LOG_LEVEL: INFO
+          POWERTOOLS_SERVICE_NAME: nod-read-api
+          BLOCKS_BUCKET: !Ref MainS3Bucket
+          BLOCKS_TABLE: !Select [1, !Split ['/', !GetAtt BlockManagementTable.Arn]] 
+      FunctionUrlConfig:
+        AuthType: NONE
+      Policies:
+        - Statement:
+          - Sid: S3BucketAccess
+            Effect: Allow
+            Action:
+            - s3:GetObject
+            Resource: !Join ['',['arn:aws:s3:::',!Ref MainS3Bucket,'/*']]
+    Metadata:
+      DockerContext: .
+      Dockerfile: Dockerfile
+  
+  BlockManagementTable:
+    Type: AWS::DynamoDB::Table
+    Properties: 
+      TableName: nod_blocks
+      AttributeDefinitions: 
+        - AttributeName: block_id
+          AttributeType: S
+      KeySchema: 
+        - AttributeName: block_id
+          KeyType: HASH
+      ProvisionedThroughput: 
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+
+Outputs:
+  FunctionUrl:
+    Description: Funciton URL
+    Value: !GetAtt ReadServiceLambdaUrl.FunctionUrl

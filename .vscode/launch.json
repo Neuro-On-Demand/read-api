@@ -1,0 +1,26 @@
+{
+    "configurations": [
+        {
+            "type": "aws-sam",
+            "request": "direct-invoke",
+            "name": "Processor",
+            "invokeTarget": {
+                "templatePath": "template.yaml",
+                "logicalId": "QueueConsumerFunction",
+                "target": "template"
+            },
+            "lambda": {
+                "runtime": "python3.10",
+                "payload": {
+                    "path": "local/json/local-event.json"
+                },
+                "environmentVariables": {},
+                "timeoutSec": 300,
+                "memoryMb": 2048
+            },
+            "sam": {
+                "containerBuild": true
+            }
+        }
+    ]
+}
